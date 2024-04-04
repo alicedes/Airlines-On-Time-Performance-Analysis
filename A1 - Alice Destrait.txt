@@ -1,0 +1,43 @@
+-- 1 Rank airlines by number of flights by year
+SELECT year, 
+	marketing_airline_network, COUNT(*) AS number_of_flights
+FROM "reporting carrier on-time performance"."mban2_ad"
+GROUP BY marketing_airline_network, year
+ORDER BY number_of_flights DESC;
+
+-- 2 Best day of week to minimise delays
+SELECT dayofweek,  
+    ROUND(AVG(carrierdelay + weatherdelay + nasdelay + securitydelay + lateaircraftdelay)) AS delays
+FROM "reporting carrier on-time performance"."mban2_ad"
+GROUP BY dayofweek
+ORDER BY delays;
+
+-- 2 Best day of the month to minimise delays
+SELECT dayofmonth,  
+    ROUND(AVG(carrierdelay + weatherdelay + nasdelay + securitydelay + lateaircraftdelay)) AS delays
+FROM "reporting carrier on-time performance"."mban2_ad"
+GROUP BY dayofmonth
+ORDER BY delays;
+
+-- 3 Average delay per first flight date
+SELECT MIN(flightdate) AS firstflight,
+  ROUND(AVG(carrierdelay + weatherdelay + nasdelay + securitydelay + lateaircraftdelay)) AS delays
+FROM "reporting carrier on-time performance"."mban2_ad"
+GROUP BY flightdate
+ORDER BY delays DESC;
+
+-- 4. Number of planes per traject over time
+SELECT flightdate,
+	dayofweek, 
+	CONCAT(deststate, ' to ', origincityname) AS destination, 
+	COUNT(*) AS flights
+FROM "reporting carrier on-time performance"."mban2_ad"
+GROUP BY flightdate, dayofweek, CONCAT(deststate, ' to ', origincityname)
+ORDER BY flightdate;
+
+-- 5. Percentage of flights delayed due to weather per airport
+SELECT origincityname, 
+    ROUND((SUM(CASE WHEN weatherdelay > 0 THEN 1 ELSE 0 END) * 100.0) / COUNT(*), 2) AS PercentageDelayedWeather
+FROM "reporting carrier on-time performance"."mban2_ad"
+GROUP BY origincityname
+ORDER BY PercentageDelayedWeather DESC;
